@@ -5,6 +5,8 @@
 ##-----------------------------------------------------------------------------
 
 import validation_helpers
+import synapseclient
+syn = synapseclient.login()
 
 ## A Synapse project will hold the assetts for your challenge. Put its
 ## synapse ID here, for example
@@ -75,17 +77,19 @@ def validate_submission(evaluation, submission):
     if not v[0]:
         return v
 
-    # Validate header order
-    v = validation_helpers.validate_header_order(wMarkdown)
+    # # Validate header order
+    # v = validation_helpers.validate_header_order(wMarkdown)
 
-    if not v[0]:
-        return v
+    # if not v[0]:
+        # return v
 
     # Validate word counts
     v = validation_helpers.validate_wordcounts(wMarkdown)
 
+    if not v[0]:
+        return v
 
-
+    return True, "A-OK."
 
 def score_submission(evaluation, submission):
     """

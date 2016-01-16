@@ -1,3 +1,5 @@
+import re
+
 _headers = dict(methods="**Methods**", collab="**Collaboration**",
                 narrative="**Project Narrative**")
 
@@ -85,7 +87,7 @@ def validate_headers(wmarkdown):
 
     errors = []
 
-    for k in _header.keys():
+    for k in _headers.keys():
         if k not in posDict.keys():
             errors += ["Missing %s header." % (k,)]
 
