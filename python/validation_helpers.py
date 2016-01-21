@@ -64,9 +64,11 @@ def validate_header_order(wmarkdown):
 
     errors = []
 
-    for n, x in enumerate(_headers_order[1:]):
-        if posDict[_headers_order[x - 1]] < posDict[_headers_order[x]]:
-            errors += ["Header %s out of order." % (_headers_order[x - 1],)]
+    for x in range(1, len(_headers_order)):
+        header1, header2 = _headers_order[x-1], _headers_order[x]
+
+        if posDict[header1] > posDict[header2]:
+            errors += ["Header %s out of order." % (header1, )]
 
     if len(errors) > 0:
         return False, "\n".join(errors)
@@ -129,4 +131,4 @@ def validate_wordcounts(wmarkdown):
     if len(errors) > 0:
         return False, "\n".join(errors)
     else:
-        return True, "Word count validated."
+        return True, "Word count validated. Methods section: %s, Narrative section: %s" % (methodsLength, narrativeLength)

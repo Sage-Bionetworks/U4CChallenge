@@ -10,7 +10,7 @@
 #   syn.login(<username>, <password>, rememberMe=True)
 #
 # Your credentials will be saved after which you may run this script with no credentials.
-# 
+#
 # Author: chris.bare
 #
 ###############################################################################
@@ -190,7 +190,8 @@ def validate(evaluation, dry_run=False):
                 username=get_user_name(profile),
                 queue_name=evaluation.name,
                 submission_id=submission.id,
-                submission_name=submission.name)
+                submission_name=submission.name,
+                message=validation_message)
         else:
             messages.validation_failed(
                 userIds=[submission.userId],
@@ -629,4 +630,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

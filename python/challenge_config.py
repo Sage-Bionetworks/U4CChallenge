@@ -71,17 +71,23 @@ def validate_submission(evaluation, submission):
     w = syn.getWiki(submission['entityId'])
     wMarkdown = w['markdown']
 
+    messages = []
+
     # Validate header existence
     v = validation_helpers.validate_headers(wMarkdown)
 
     if not v[0]:
         return v
 
-    # # Validate header order
-    # v = validation_helpers.validate_header_order(wMarkdown)
+    messages.append(v[1])
 
-    # if not v[0]:
-        # return v
+    # Validate header order
+    v = validation_helpers.validate_header_order(wMarkdown)
+
+    if not v[0]:
+        return v
+
+    messages.append(v[1])
 
     # Validate word counts
     v = validation_helpers.validate_wordcounts(wMarkdown)
@@ -89,7 +95,10 @@ def validate_submission(evaluation, submission):
     if not v[0]:
         return v
 
-    return True, "A-OK."
+    messages.append(v[1])
+
+    final_message = "\n".join(messages)
+    return (True, "\n%s\n" % (final_message, ))
 
 def score_submission(evaluation, submission):
     """
