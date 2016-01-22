@@ -49,7 +49,9 @@ validation_passed_subject_template = "Submission received to {queue_name}"
 validation_passed_template = """\
 Hello {username},
 
-We have received your submission to the {queue_name} and confirmed that it is correctly formatted.
+We have received your submission to the {queue_name} and confirmed that it is correctly formatted:
+
+{message}
 
 submission name: {submission_name}
 submission ID: {submission_id}
@@ -137,7 +139,7 @@ formatter = DefaultingFormatter()
 
 def validation_failed(userIds, **kwargs):
     if send_messages:
-        return send_message(userIds=userIds, 
+        return send_message(userIds=userIds,
                             subject_template=validation_failed_subject_template,
                             message_template=validation_failed_template,
                             kwargs=kwargs)
@@ -189,6 +191,3 @@ def send_message(userIds, subject_template, message_template, kwargs):
         return response
     else:
         sys.stderr.write("Can't send message. No Synapse object configured\n")
-
-
-
