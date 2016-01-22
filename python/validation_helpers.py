@@ -8,6 +8,17 @@ _headers_order = ["methods", "narrative", "collab"]
 _maxNarrativeLength = 24000
 _maxMethodsLength = 16000
 
+_evalPanelId = 3331171
+
+def findAbstract(parentId, syn):
+    r = syn.query('select id,name from folder where parentId=="%s"' % (parentId, ))
+    r = filter(lambda x: x['folder.name'] == "Abstract", r['results'])
+
+    if len(r) > 0:
+        return r[0]['folder.id']
+    else:
+        return None
+
 def cleanWiki(w):
     wl = w.split("\n")
     wl = filter(lambda x: len(x) > 0 and (not x.startswith("${")) and (not x.startswith("> This is a sample project")), wl)
@@ -132,3 +143,28 @@ def validate_wordcounts(wmarkdown):
         return False, "\n".join(errors)
     else:
         return True, "Word count validated. Methods section: %s, Narrative section: %s" % (methodsLength, narrativeLength)
+
+def validate_abstract(projectId, syn):
+    abstractId = findAbstract(projectId,  syn)
+
+    w = syn.getWiki(abstractId)
+    wMarkdown = w['markdown']
+
+    if abstractId:
+        if len(wMarkdown) > 0:
+            return (True, "Found non-empty abstract at %s" % (abstractId, ))
+        else:
+            return (False, "Found abstract at %s, but no text." % (abstractId, ))
+    else:
+        return (False, "No abstract found")
+
+def validate_panel_access(projectId, syn):
+
+    perms = syn.getPermissions('syn4154450', _evalPanelId)
+
+    if perms == [u'READ']:
+        return (True, "Evaluation panel can read the project.")
+    elif u'READ' in perms and len(perms) > 1:
+        return (False, "Evaluation panel can do more than read. Only provide read permissions.")
+    else:
+        return (False, "Evaluation cannot read the project.")
