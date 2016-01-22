@@ -96,6 +96,21 @@ def validate_submission(evaluation, submission):
         return v
 
     messages.append(v[1])
+    # Validate non-empty abstract existence
+    v = validation_helpers.validate_abstract(submission['entityId'], syn)
+
+    if not v[0]:
+        return v
+
+    messages.append(v[1])
+
+    # Validate access by evaluation panel
+    v = validation_helpers.validate_panel_access(submission['entityId'], syn)
+
+    if not v[0]:
+        return v
+
+    messages.append(v[1])
 
     final_message = "\n".join(messages)
     return (True, "\n%s\n" % (final_message, ))
