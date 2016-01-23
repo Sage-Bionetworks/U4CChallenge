@@ -1,6 +1,6 @@
 #
 # Create assets to demonstrate challenge scoring in Synapse
-# 
+#
 # Author: chris.bare
 #
 ###############################################################################
@@ -523,4 +523,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
