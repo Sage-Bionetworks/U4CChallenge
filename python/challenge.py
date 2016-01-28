@@ -166,9 +166,14 @@ def validate(evaluation, dry_run=False):
 
         ## refetch the submission so that we get the file path
         ## to be later replaced by a "downloadFiles" flag on getSubmissionBundles
-        submission = syn.getSubmission(submission)
+        try:
+            submission = syn.getSubmission(submission)
+        except Exception as ex1:
+            is_valid = False
+            print "Could not get submission:", type(ex1), ex1, ex1.message
+            traceback.print_exc()
+            validation_message = str(ex1)
 
-        print "validating", submission.id, submission.name
         try:
             is_valid, validation_message = conf.validate_submission(evaluation, submission)
         except Exception as ex1:
@@ -198,6 +203,7 @@ def validate(evaluation, dry_run=False):
                 username=get_user_name(profile),
                 queue_name=evaluation.name,
                 submission_id=submission.id,
+                project_id=submission.entityId,
                 submission_name=submission.name,
                 message=validation_message)
 

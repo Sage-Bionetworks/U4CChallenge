@@ -68,11 +68,25 @@ def validate_submission(evaluation, submission):
               validation fails or throws exception
     """
 
-    w = syn.getWiki(submission['entityId'])
-    wMarkdown = w['markdown']
-
     messages = []
 
+    # Validate access by evaluation panel
+    v = validation_helpers.validate_panel_access(submission['entityId'], syn)
+
+    if not v[0]:
+        return v
+
+    messages.append(v[1])
+
+    try:
+        w = syn.getWiki(submission['entityId'])
+        wMarkdown = w['markdown']
+    except synapseclient.client.SynapseHTTPError as e:
+        v = (False, "Cannot read project - no permissions.")
+
+    if not v[0]:
+        return v
+        
     # Validate header existence
     v = validation_helpers.validate_headers(wMarkdown)
 
@@ -98,14 +112,6 @@ def validate_submission(evaluation, submission):
     messages.append(v[1])
     # Validate non-empty abstract existence
     v = validation_helpers.validate_abstract(submission['entityId'], syn)
-
-    if not v[0]:
-        return v
-
-    messages.append(v[1])
-
-    # Validate access by evaluation panel
-    v = validation_helpers.validate_panel_access(submission['entityId'], syn)
 
     if not v[0]:
         return v

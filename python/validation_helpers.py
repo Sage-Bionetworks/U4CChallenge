@@ -167,4 +167,4 @@ def validate_panel_access(projectId, syn):
     elif u'READ' in perms and len(perms) > 1:
         return (False, "Evaluation panel can do more than read. Only provide read permissions.")
     else:
-        return (False, "Evaluation cannot read the project.")
+        return (False, "Evaluation panel cannot read the project.")

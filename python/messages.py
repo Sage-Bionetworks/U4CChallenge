@@ -16,7 +16,7 @@ dry_run = False
 
 ## Edit these URLs to point to your challenge and its support forum
 defaults = dict(
-    challenge_instructions_url = "https://www.synapse.org/upforachallenge",
+    challenge_instructions_url = "https://www.synapse.org/#!Synapse:syn3157598/wiki/232617",
     support_forum_url = "support.sagebase.org/sagebase/products/sagebase_up_for_a_challenge")
 
 ##---------------------------------------------------------
@@ -33,8 +33,11 @@ validation_failed_template = """\
 <p>Please refer to the challenge instructions which can be found at \
 {challenge_instructions_url} and to the error message below:</p>
 
-<p>submission name: <b>{submission_name}</b><br>
-submission ID: <b>{submission_id}</b></p>
+<p>
+submission name: <b>{submission_name}</b><br>
+submission ID: <b>{submission_id}</b><br>
+project ID: <b>{project_id}<b>
+</p>
 
 <blockquote><pre>
 {message}
@@ -52,8 +55,11 @@ validation_passed_template = """\
 
 <p>We have received your submission to the {queue_name} and confirmed that it is correctly formatted.</p>
 
-<p>submission name: <b>{submission_name}</b><br>
-submission ID: <b>{submission_id}</b></p>
+<p>
+submission name: <b>{submission_name}</b><br>
+submission ID: <b>{submission_id}</b><br>
+project ID: <b>{project_id}<b>
+</p>
 
 <blockquote><pre>
 {message}
