@@ -1,12 +1,15 @@
 import re
+import synapseclient
 
-_headers = dict(methods="**Methods**", collab="**Collaboration**",
-                narrative="**Project Narrative**")
+_headers = dict(team="**Team Name**", datasets="**Identification of Datasets Used**",
+                methods="**Methods**", collab="**Collaboration**",
+                narrative="**Project Narrative**", code="**Code**")
 
-_headers_order = ["methods", "narrative", "collab"]
+_headers_order = ["team", "datasets", "methods", "narrative", "collab", "code"]
 
 _maxNarrativeLength = 24000
 _maxMethodsLength = 16000
+_maxDatasetsLength = 4000
 
 _evalPanelId = 3331171
 
@@ -87,7 +90,7 @@ def validate_header_order(wmarkdown):
         return True, "Header order validated."
 
 def validate_headers(wmarkdown):
-    """Find the methods, narrative, and collaborator headers.
+    """Check for the existence of the headers.
 
     """
 
@@ -110,7 +113,7 @@ def validate_headers(wmarkdown):
         return True, "Headers validated."
 
 def validate_wordcounts(wmarkdown):
-    """Check the methods and narrative sections to see if word count limits are met.
+    """Check the datasets, methods and narrative sections to see if word count limits are met.
 
     """
 
@@ -120,6 +123,11 @@ def validate_wordcounts(wmarkdown):
 
     # Find the lines of methods, narrative and collab headers
     posDict = findHeaderPos(wl)
+
+    # Datasets should in between the datasets and method headers
+    datasets = wl[posDict['datasets'] + 1:posDict['methods']]
+    datasets = cleanSections(datasets)
+    datasetsLength = sum(map(len, datasets))
 
     # Methods should in between the method and narrative headers
     methods = wl[posDict['methods'] + 1:posDict['narrative']]
@@ -132,35 +140,47 @@ def validate_wordcounts(wmarkdown):
     narrativeLength = sum(map(len, narrative))
 
     errors = []
+    if datasetsLength > _maxDatasetsLength:
+        errors += ["Dataset identification section is too long (%s characters). Maximum is %s." % (datasetsLength, _maxDatasetsLength)]
 
     if methodsLength > _maxMethodsLength:
-        errors += ["Methods section is too long (%s characters). Maximum is %s." % (methodsLength, )]
+        errors += ["Methods section is too long (%s characters). Maximum is %s." % (methodsLength, _maxMethodsLength)]
 
     if narrativeLength > _maxNarrativeLength:
-        errors += ["Narrative section is too long (%s characters)." % (narrativeLength, )]
+        errors += ["Narrative section is too long (%s characters). Maximum is %s." % (narrativeLength, _maxNarrativeLength)]
 
     if len(errors) > 0:
         return False, "\n".join(errors)
     else:
-        return True, "Word count validated. Methods section: %s, Narrative section: %s" % (methodsLength, narrativeLength)
+        return True, "Word count validated (datasets: %s, methods: %s characters, narrative section: %s characters)." % (datasetsLength, methodsLength, narrativeLength)
 
 def validate_abstract(projectId, syn):
     abstractId = findAbstract(projectId,  syn)
 
-    w = syn.getWiki(abstractId)
-    wMarkdown = w['markdown']
-
     if abstractId:
-        if len(wMarkdown) > 0:
-            return (True, "Found non-empty abstract at %s" % (abstractId, ))
+
+        try:
+            w = syn.getWiki(abstractId)
+        except synapseclient.exceptions.SynapseHTTPError as e:
+
+            return (False, "Found abstract folder at %s, but a Wiki has not been added to it. Please add the text of your abstract to the Wiki of that Folder." % (abstractId, ))
+
+        wMarkdown = w['markdown']
+
+        wl = cleanWiki(wMarkdown)
+        wl[:] = removeCodeBlocks(wl)
+        abstractLength = sum(map(len, wl))
+
+        if abstractLength > 0:
+            return (True, "Found non-empty abstract at %s (%s characters)" % (abstractId, abstractLength))
         else:
-            return (False, "Found abstract at %s, but no text." % (abstractId, ))
+            return (False, "Found abstract folder at %s but no text. Please add the text of your abstract to the Wiki of that Folder." % (abstractId, ))
     else:
-        return (False, "No abstract found")
+        return (False, "No abstract found. Please add an Abstract Folder and put the text of your abstract on the Wiki of that Folder.")
 
 def validate_panel_access(projectId, syn):
 
-    perms = syn.getPermissions('syn4154450', _evalPanelId)
+    perms = syn.getPermissions(projectId, _evalPanelId)
 
     if perms == [u'READ']:
         return (True, "Evaluation panel can read the project.")

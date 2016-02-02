@@ -28,20 +28,23 @@ validation_failed_subject_template = "Validation error in submission to {queue_n
 validation_failed_template = """\
 <p>Hello {username},</p>
 
-<p>Sorry, but we were unable to validate your submission to the {queue_name}.</p>
-
-<p>Please refer to the challenge instructions which can be found at \
-{challenge_instructions_url} and to the error message below:</p>
+<p>You submitted:</p>
 
 <p>
 submission name: <b>{submission_name}</b><br>
 submission ID: <b>{submission_id}</b><br>
-project ID: <b>{project_id}<b>
+project ID: <b>{project_id}</b>
 </p>
 
-<blockquote><pre>
+<p>Sorry, but we were unable to validate your submission to the {queue_name}. <b>Please correct the changes below and resubmit your Project.</b></p>
+
+<b>
 {message}
-</pre></blockquote>
+</b>
+
+
+<p>Please refer to the challenge instructions which can be found at \
+{challenge_instructions_url} and to the error message below:</p>
 
 <p>If you have questions, please ask on the forums at {support_forum_url}.</p>
 
@@ -58,12 +61,12 @@ validation_passed_template = """\
 <p>
 submission name: <b>{submission_name}</b><br>
 submission ID: <b>{submission_id}</b><br>
-project ID: <b>{project_id}<b>
+project ID: <b>{project_id}</b>
 </p>
 
-<blockquote><pre>
+<b>
 {message}
-</pre></blockquote>
+</b>
 
 <p>If you have questions, please ask on the forums at {support_forum_url} or refer to the challenge \
 instructions which can be found at {challenge_instructions_url}.</p>

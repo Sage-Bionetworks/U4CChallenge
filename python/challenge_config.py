@@ -86,7 +86,7 @@ def validate_submission(evaluation, submission):
 
     if not v[0]:
         return v
-        
+
     # Validate header existence
     v = validation_helpers.validate_headers(wMarkdown)
 
@@ -118,8 +118,8 @@ def validate_submission(evaluation, submission):
 
     messages.append(v[1])
 
-    final_message = "\n".join(messages)
-    return (True, "\n%s\n" % (final_message, ))
+    final_message = "<br/>\n".join(messages)
+    return (True, "<br/>\n%s\n<br/>\n" % (final_message, ))
 
 def score_submission(evaluation, submission):
     """

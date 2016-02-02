@@ -195,6 +195,7 @@ def validate(evaluation, dry_run=False):
                 username=get_user_name(profile),
                 queue_name=evaluation.name,
                 submission_id=submission.id,
+                project_id=submission.entityId,
                 submission_name=submission.name,
                 message=validation_message)
         else:
@@ -464,6 +465,16 @@ def command_check_status(args):
     print unicode(submission).encode('utf-8')
     print unicode(status).encode('utf-8')
 
+def command_delete(args):
+    submissions = []
+    for queue_info in conf.evaluation_queues:
+        submissions.extend([submission.id for submission, status in syn.getSubmissionBundles(queue_info['id'])])
+
+    to_delete = list(set(map(int, submissions)).intersection(set(args.submission)))
+
+    print "Will delete: %s" % (to_delete, )
+    # print map(lambda x: syn.restDELETE("/evaluation/submission/%s" % x), [5601347, 5601471, 5601476])
+    print map(lambda x: syn.restDELETE("/evaluation/submission/%s" % x), [5601347, 5601471, 5601476])
 
 def command_reset(args):
     if args.rescore_all:
@@ -585,6 +596,10 @@ def main():
     parser_leaderboard.add_argument("evaluation", metavar="EVALUATION-ID", default=None)
     parser_leaderboard.add_argument("--out", default=None)
     parser_leaderboard.set_defaults(func=command_leaderboard)
+
+    parser_delete = subparsers.add_parser('delete', help="Delete a submission")
+    parser_delete.add_argument("submission", metavar="SUBMISSION-ID", type=int, nargs='*', help="One or more submission IDs.")
+    parser_delete.set_defaults(func=command_delete)
 
     args = parser.parse_args()
 
