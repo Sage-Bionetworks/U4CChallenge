@@ -2,10 +2,10 @@ import re
 import synapseclient
 
 _headers = dict(team="**Team Name**", datasets="**Identification of Datasets Used**",
-                methods="**Methods**", collab="**Collaboration**",
+                methods="**Methods**", collaboration="**Collaboration**",
                 narrative="**Project Narrative**", code="**Code**")
 
-_headers_order = ["team", "datasets", "methods", "narrative", "collab", "code"]
+_headers_order = ["team", "datasets", "methods", "narrative", "collaboration", "code"]
 
 _maxNarrativeLength = 24000
 _maxMethodsLength = 16000
@@ -135,7 +135,7 @@ def validate_wordcounts(wmarkdown):
     methodsLength = sum(map(len, methods))
 
     # Narrative should be between the narrative and collab headers
-    narrative = wl[posDict['narrative'] + 1:posDict['collab']]
+    narrative = wl[posDict['narrative'] + 1:posDict['collaboration']]
     narrative = cleanSections(narrative)
     narrativeLength = sum(map(len, narrative))
 
@@ -152,7 +152,7 @@ def validate_wordcounts(wmarkdown):
     if len(errors) > 0:
         return False, "\n".join(errors)
     else:
-        return True, "Word count validated (datasets: %s, methods: %s characters, narrative section: %s characters)." % (datasetsLength, methodsLength, narrativeLength)
+        return True, "Word count validated (datasets: %s characters, methods: %s characters, narrative section: %s characters)." % (datasetsLength, methodsLength, narrativeLength)
 
 def validate_abstract(projectId, syn):
     abstractId = findAbstract(projectId,  syn)

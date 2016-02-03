@@ -48,6 +48,7 @@ import traceback
 import urllib
 import uuid
 import warnings
+import subprocess
 
 try:
     import challenge_config as conf
@@ -376,7 +377,15 @@ def list_submissions(evaluation, status=None, **kwargs):
     print '-' * 60
 
     for submission, status in syn.getSubmissionBundles(evaluation, status=status):
-        print submission.id, submission.createdOn, status.status, submission.name.encode('utf-8'), submission.userId
+
+        try:
+            teamId = submission.teamId
+            isTeam = "Team"
+        except AttributeError:
+            teamId = submission.userId
+            isTeam = "Individual"
+
+        print submission.id, submission.createdOn, status.status, submission.name.encode('utf-8'), submission.userId, isTeam, teamId
 
 
 def list_evaluations(project):
@@ -388,48 +397,21 @@ def list_evaluations(project):
         print "Evaluation: %s" % evaluation.id, evaluation.name.encode('utf-8')
 
 
-def archive(evaluation, destination=None, name=None, query=None):
+def archive(submission, archiveRCommandPath):
     """
-    Archive the submissions for the given evaluation queue and store them in the destination synapse folder.
+    Archive a submission.
 
-    :param evaluation: a synapse evaluation queue or its ID
-    :param destination: a synapse folder or its ID
-    :param query: a query that will return the desired submissions. At least the ID must be returned.
-                  defaults to _select * from evaluation_[EVAL_ID] where status=="SCORED"_.
+    Requires littler and the R script for archiving.
+
+    :param submission: a synapse submission ID
     """
-    tempdir = tempfile.mkdtemp()
-    archive_dirname = 'submissions_%s' % utils.id_of(evaluation)
 
-    if not query:
-        query = 'select * from evaluation_%s where status=="SCORED"' % utils.id_of(evaluation)
+    if type(submission) != Submission:
+        submission = syn.getSubmission(submission)
 
-    ## for each submission, download it's associated file and write a line of metadata
-    results = Query(query=query)
-    if 'objectId' not in results.headers:
-        raise ValueError("Can't find the required field \"objectId\" in the results of the query: \"{0}\"".format(query))
-    if not name:
-        name = 'submissions_%s.tgz' % utils.id_of(evaluation)
-    tar_path = os.path.join(tempdir, name)
-    print "creating tar at:", tar_path
-    print results.headers
-    with tarfile.open(tar_path, mode='w:gz') as archive:
-        with open(os.path.join(tempdir, 'submission_metadata.csv'), 'w') as f:
-            f.write( (','.join(hdr for hdr in (results.headers + ['filename'])) + '\n').encode('utf-8') )
-            for result in results:
-                ## retrieve file into cache and copy it to destination
-                submission = syn.getSubmission(result[results.headers.index('objectId')])
-                prefixed_filename = submission.id + "_" + os.path.basename(submission.filePath)
-                archive.add(submission.filePath, arcname=os.path.join(archive_dirname, prefixed_filename))
-                line = (','.join(unicode(item) for item in (result+[prefixed_filename]))).encode('utf-8')
-                print line
-                f.write(line + '\n')
-        archive.add(
-            name=os.path.join(tempdir, 'submission_metadata.csv'),
-            arcname=os.path.join(archive_dirname, 'submission_metadata.csv'))
+    output = subprocess.check_output(['r', archiveRCommandPath, submission.id])
 
-    entity = syn.store(File(tar_path, parent=destination), evaluation_id=utils.id_of(evaluation))
-    print "created:", entity.id, entity.name
-    return entity.id
+    return output
 
 
 ## ==================================================
@@ -473,8 +455,11 @@ def command_delete(args):
     to_delete = list(set(map(int, submissions)).intersection(set(args.submission)))
 
     print "Will delete: %s" % (to_delete, )
-    # print map(lambda x: syn.restDELETE("/evaluation/submission/%s" % x), [5601347, 5601471, 5601476])
-    print map(lambda x: syn.restDELETE("/evaluation/submission/%s" % x), [5601347, 5601471, 5601476])
+
+    for submission in to_delete:
+        foo = syn.restDELETE("/evaluation/submission/%s" % submission)
+        print "Deleted %s" % (submission, )
+
 
 def command_reset(args):
     if args.rescore_all:
@@ -528,7 +513,8 @@ def command_leaderboard(args):
 
 
 def command_archive(args):
-    archive(args.evaluation, args.destination, name=args.name, query=args.query)
+    for submission in args.submission:
+        archive(submission, conf.R_ARCHIVE_COMMAND_PATH)
 
 
 ## ==================================================
@@ -600,6 +586,10 @@ def main():
     parser_delete = subparsers.add_parser('delete', help="Delete a submission")
     parser_delete.add_argument("submission", metavar="SUBMISSION-ID", type=int, nargs='*', help="One or more submission IDs.")
     parser_delete.set_defaults(func=command_delete)
+
+    parser_archive = subparsers.add_parser('archive', help="Archive a submission")
+    parser_archive.add_argument("submission", metavar="SUBMISSION-ID", type=int, nargs='*', help="One or more submission IDs.")
+    parser_archive.set_defaults(func=command_archive)
 
     args = parser.parse_args()
 

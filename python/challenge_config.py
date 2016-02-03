@@ -50,15 +50,18 @@ LEADERBOARD_COLUMNS = [
 ## questions would typically have different scoring metrics.
 leaderboard_columns = {}
 for q in evaluation_queues:
-    leaderboard_columns[q['id']] = LEADERBOARD_COLUMNS + [
-        dict(name='score',         display_name='Score',   columnType='DOUBLE'),
-        dict(name='rmse',          display_name='RMSE',    columnType='DOUBLE'),
-        dict(name='auc',           display_name='AUC',     columnType='DOUBLE')]
+    leaderboard_columns[q['id']] = LEADERBOARD_COLUMNS
+    # + [
+    #     dict(name='score',         display_name='Score',   columnType='DOUBLE'),
+    #     dict(name='rmse',          display_name='RMSE',    columnType='DOUBLE'),
+    #     dict(name='auc',           display_name='AUC',     columnType='DOUBLE')]
 
 ## map each evaluation queues to the synapse ID of a table object
 ## where the table holds a leaderboard for that question
 leaderboard_tables = {}
 
+## R command file to run archiving
+R_ARCHIVE_COMMAND_PATH = '/home/kdaily/Projects/U4C_NCI/code/U4CChallenge/R/archiveProject.R'
 
 def validate_submission(evaluation, submission):
     """
