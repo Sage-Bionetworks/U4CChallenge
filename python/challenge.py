@@ -191,6 +191,12 @@ def validate(evaluation, dry_run=False):
         ## send message AFTER storing status to ensure we don't get repeat messages
         profile = syn.getUserProfile(submission.userId)
         if is_valid:
+
+            try:
+                a = archive(submission, conf.R_ARCHIVE_COMMAND_PATH)
+            except exception as e:
+                print "Couldn't archive: %s" % e
+
             messages.validation_passed(
                 userIds=[submission.userId],
                 username=get_user_name(profile),
