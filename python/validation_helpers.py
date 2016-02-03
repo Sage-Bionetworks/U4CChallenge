@@ -8,7 +8,7 @@ _headers = dict(team="**Team Name**", datasets="**Identification of Datasets Use
 _headers_order = ["team", "datasets", "methods", "narrative", "collaboration", "code"]
 
 _maxNarrativeLength = 24000
-_maxMethodsLength = 16000
+_maxMethodsLength = 16000	
 _maxDatasetsLength = 4000
 
 _evalPanelId = 3331171
