@@ -26,6 +26,9 @@ newP <- synStore(Project(name=paste("Archived ", as.numeric(Sys.time()), submiss
 # Perform a copy
 pC <- copyProject(newP@properties$id, G, topId=newP@properties$id)
 
+synSetAnnotations(newP) <- list(evaluationId=submission$id, userId=submission$userId,
+                                entityId=submission$entityId, teamId=submission$teamId)
+
 # Create entity mapping to update wikis
 entityMap <- pC$newid
 names(entityMap) <- G$id
