@@ -192,10 +192,13 @@ def validate(evaluation, dry_run=False):
         profile = syn.getUserProfile(submission.userId)
         if is_valid:
 
-            try:
-                a = archive(submission, conf.R_ARCHIVE_COMMAND_PATH)
-            except exception as e:
-                print "Couldn't archive: %s" % e
+            proj = syn.get(submission['entityId'], downloadFile=False)
+
+            if not dry_run:
+                try:
+                    a = archive(submission, conf.R_ARCHIVE_COMMAND_PATH)
+                except Exception as e:
+                    print "Couldn't archive: %s" % e
 
             messages.validation_passed(
                 userIds=[submission.userId],
@@ -203,6 +206,7 @@ def validate(evaluation, dry_run=False):
                 queue_name=evaluation.name,
                 submission_id=submission.id,
                 project_id=submission.entityId,
+                project_name=proj.name,
                 submission_name=submission.name,
                 message=validation_message)
         else:
@@ -212,6 +216,7 @@ def validate(evaluation, dry_run=False):
                 queue_name=evaluation.name,
                 submission_id=submission.id,
                 project_id=submission.entityId,
+                project_name=proj.name,
                 submission_name=submission.name,
                 message=validation_message)
 

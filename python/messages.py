@@ -31,12 +31,13 @@ validation_failed_template = """\
 <p>You submitted:</p>
 
 <p>
-submission name: <b>{submission_name}</b><br>
-submission ID: <b>{submission_id}</b><br>
-project ID: <b>{project_id}</b>
+Submission Name: <b>{submission_name}</b><br/>
+Submission ID: <b>{submission_id}</b><br/>
+Project Title: <b>{project_name}</b><br/>
+Project ID: <b>{project_id}</b>
 </p>
 
-<p>Sorry, but we were unable to validate your submission to the {queue_name}. <b>Please correct the changes below and resubmit your Project.</b></p>
+<p>Sorry, but we were unable to validate your submission. <b>Please correct the changes below and resubmit your Project.</b></p>
 
 <b>
 {message}
@@ -56,12 +57,15 @@ validation_passed_subject_template = "Submission received to {queue_name}"
 validation_passed_template = """\
 <p>Hello {username},</p>
 
-<p>We have received your submission to the {queue_name} and confirmed that it is correctly formatted.</p>
+<p>Congratulations, you have successfully submitted to U4C!"</p>
+
+<p>We have received your submission and confirmed that it is correctly formatted.</p>
 
 <p>
-submission name: <b>{submission_name}</b><br>
-submission ID: <b>{submission_id}</b><br>
-project ID: <b>{project_id}</b>
+Submission Name: <b>{submission_name}</b><br/>
+Submission ID: <b>{submission_id}</b><br/>
+Project Title: <b>{project_name}</b><br/>
+Project ID: <b>{project_id}</b>
 </p>
 
 <b>
