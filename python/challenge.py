@@ -473,12 +473,13 @@ def command_delete(args):
 
 
 def command_reset(args):
-    if args.rescore_all:
+    if args.reset_all:
         for queue_info in conf.evaluation_queues:
-            for submission, status in syn.getSubmissionBundles(queue_info['id'], status="SCORED"):
+            for submission, status in syn.getSubmissionBundles(queue_info['id']):
                 status.status = args.status
                 if not args.dry_run:
                     print unicode(syn.store(status)).encode('utf-8')
+
     for submission in args.submission:
         status = syn.getSubmissionStatus(submission)
         status.status = args.status
@@ -565,7 +566,7 @@ def main():
     parser_reset = subparsers.add_parser('reset', help="Reset a submission to RECEIVED for re-scoring (or set to some other status)")
     parser_reset.add_argument("submission", metavar="SUBMISSION-ID", type=int, nargs='*', help="One or more submission IDs, or omit if using --rescore-all")
     parser_reset.add_argument("-s", "--status", default='RECEIVED')
-    parser_reset.add_argument("--rescore-all", action="store_true", default=False)
+    parser_reset.add_argument("--reset-all", action="store_true", default=False)
     parser_reset.set_defaults(func=command_reset)
 
     parser_validate = subparsers.add_parser('validate', help="Validate all RECEIVED submissions to an evaluation")
