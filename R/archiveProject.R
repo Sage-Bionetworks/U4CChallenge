@@ -26,8 +26,9 @@ newP <- synStore(Project(name=paste("Archived ", as.numeric(Sys.time()), submiss
 # Perform a copy
 pC <- copyProject(newP@properties$id, G, topId=newP@properties$id)
 
-synSetAnnotations(newP) <- list(evaluationId=submission$id, userId=submission$userId,
-                                entityId=submission$entityId, teamId=submission$teamId)
+synSetAnnotations(newP) <- list(evaluationId=s$evaluationId, submissionId=submission$id,
+                                submittingUserId=submission$userId, origEntityId=submission$entityId,
+                                submittingTeamId=submission$teamId, projectName=oldP@properties$name)
 
 newP <- synStore(newP)
 
