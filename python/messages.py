@@ -57,7 +57,7 @@ validation_passed_subject_template = "Submission received to {queue_name}"
 validation_passed_template = """\
 <p>Hello {username},</p>
 
-<p>Congratulations, you have successfully submitted to U4C!"</p>
+<h3>Congratulations, you have successfully submitted to U4C!</h3>
 
 <p>We have received your submission and confirmed that it is correctly formatted.</p>
 
