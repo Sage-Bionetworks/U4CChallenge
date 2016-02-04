@@ -21,14 +21,19 @@ oldP <- synGet(oldPId)
 G <- crawlSynapseObject(oldPId)
 
 # New project will be copy of the old one
-newP <- synStore(Project(name=paste("Archived ", as.numeric(Sys.time()), submission$id, oldP@properties$id, oldP@properties$name)))
+newP <- Project(name=paste("Archived ", as.numeric(Sys.time()), submission$id, oldP@properties$id, oldP@properties$name))
+
+synSetAnnotations(newP) <- list(evaluationId=submission$evaluationId, submissionId=submission$id,
+                                submittingUserId=submission$userId, origEntityId=submission$entityId,
+                                submittingTeamId=submission$teamId, projectName=oldP@properties$name,
+                                archived=FALSE)
+
+newP <- synStore(newP)
 
 # Perform a copy
 pC <- copyProject(newP@properties$id, G, topId=newP@properties$id)
 
-synSetAnnotations(newP) <- list(evaluationId=s$evaluationId, submissionId=submission$id,
-                                submittingUserId=submission$userId, origEntityId=submission$entityId,
-                                submittingTeamId=submission$teamId, projectName=oldP@properties$name)
+synSetAnnotation(newP, "archived") <- TRUE
 
 newP <- synStore(newP)
 
