@@ -11,10 +11,10 @@ syn = synapseclient.login()
 ## A Synapse project will hold the assetts for your challenge. Put its
 ## synapse ID here, for example
 ## CHALLENGE_SYN_ID = "syn1234567"
-CHALLENGE_SYN_ID = "syn3157598"
+CHALLENGE_SYN_ID = "syn5591679"
 
 ## Name of your challenge, defaults to the name of the challenge's project
-CHALLENGE_NAME = "NCI Up for a Challenge (U4C)"
+CHALLENGE_NAME = "Example Synapse Challenge"
 
 ## Synapse user IDs of the challenge admins who will be notified by email
 ## about errors in the scoring script
@@ -33,17 +33,7 @@ ADMIN_USER_IDS = ["3323072"]
 ## Configuring them here as a list will save a round-trip to the server
 ## every time the script starts.
 evaluation_queues = [
-    {u'contentSource': u'syn3157598',
-     u'createdOn': u'2015-06-15T17:34:55.090Z',
-     u'description': u'The goal of this Challenge is to use innovative approaches to identify novel pathways - including new genes or combinations of genes, genetic variants, or sets of genomic features - involved in breast cancer susceptibility in order to generate new biological hypotheses.',
-     u'etag': u'598ab97e-83f7-4041-944f-de49f01d07d9',
-     u'id': u'4484862',
-     u'name': u'NCI Up For a Challenge (U4C)',
-     u'ownerId': u'3323072',
-     u'status': u'OPEN',
-     u'submissionInstructionsMessage': u'In order to submit a Challenge Entry, your team will create a Synapse Project which will address the evaluation criteria for the Challenge, along with references to source code and a Wiki documenting your methods.',
-     u'submissionReceiptMessage': u'Congratulations! Your submission has been received and will be validated. If it is valid, it will then be evaluated by the Challenge organizing committee.'}
-]
+    {'status': u'OPEN', 'contentSource': u'syn5591679', 'submissionInstructionsMessage': u'To submit to the XYZ Challenge, send a tab-delimited file as described here: https://...', u'createdOn': u'2016-01-15T22:38:09.697Z', 'submissionReceiptMessage': u'Your submission has been received. For further information, consult the leader board at https://...', u'etag': u'a9e827f7-ca98-4157-bfb8-72bbb1617872', u'ownerId': u'3323072', u'id': u'5591680', 'name': u'Example Synapse Challenge d9372db4-986d-4870-8277-70c1dac57b0e'}]
 evaluation_queue_by_id = {q['id']:q for q in evaluation_queues}
 
 ## define the default set of columns that will make up the leaderboard
@@ -71,7 +61,7 @@ for q in evaluation_queues:
 leaderboard_tables = {}
 
 ## R command file to run archiving
-R_ARCHIVE_COMMAND_PATH = '/home/kdaily/src/U4CChallenge/R/archiveProject.R'
+R_ARCHIVE_COMMAND_PATH = '/home/kdaily/Projects/U4C_NCI/code/U4CChallenge/R/archiveProject.R'
 
 def validate_submission(evaluation, submission):
     """
