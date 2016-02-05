@@ -6,7 +6,7 @@ if (is.null(argv) | length(argv)<1) {
 }
 
 library(synapseClient)
-library(synapseCopyProject)
+library(rSynapseUtilities)
 
 synapseLogin()
 
