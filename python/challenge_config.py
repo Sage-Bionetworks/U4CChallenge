@@ -61,7 +61,7 @@ for q in evaluation_queues:
 leaderboard_tables = {}
 
 ## R command file to run archiving
-R_ARCHIVE_COMMAND_PATH = '/home/kdaily/Projects/U4C_NCI/code/U4CChallenge/R/archiveProject.R'
+R_ARCHIVE_COMMAND_PATH = '/home/ubuntu/Projects/U4CChallenge/R/archiveProject.R'
 
 def validate_submission(evaluation, submission):
     """
