@@ -190,9 +190,10 @@ def validate(evaluation, dry_run=False):
 
         ## send message AFTER storing status to ensure we don't get repeat messages
         profile = syn.getUserProfile(submission.userId)
-        if is_valid:
 
-            proj = syn.get(submission['entityId'], downloadFile=False)
+        proj = syn.get(submission['entityId'], downloadFile=False)
+        
+        if is_valid:
 
             if not dry_run:
                 try:
@@ -420,7 +421,7 @@ def archive(submission, archiveRCommandPath):
     if type(submission) != Submission:
         submission = syn.getSubmission(submission)
 
-    output = subprocess.check_output(['r', archiveRCommandPath, submission.id])
+    output = subprocess.check_output(['/usr/local/bin/r', archiveRCommandPath, submission.id])
 
     return output
 
@@ -467,9 +468,10 @@ def command_delete(args):
 
     print "Will delete: %s" % (to_delete, )
 
-    for submission in to_delete:
-        foo = syn.restDELETE("/evaluation/submission/%s" % submission)
-        print "Deleted %s" % (submission, )
+    if not args.dry_run:
+        for submission in to_delete:
+            foo = syn.restDELETE("/evaluation/submission/%s" % submission)
+            print "Deleted %s" % (submission, )
 
 
 def command_reset(args):
@@ -525,6 +527,10 @@ def command_leaderboard(args):
 
 
 def command_archive(args):
+    """Create an archived copy of a Submission, including all files and Wiki pages.
+
+    """
+    
     for submission in args.submission:
         archive(submission, conf.R_ARCHIVE_COMMAND_PATH)
 
@@ -582,14 +588,7 @@ def main():
     parser_rank = subparsers.add_parser('rank', help="Rank all SCORED submissions to an evaluation")
     parser_rank.add_argument("evaluation", metavar="EVALUATION-ID", default=None)
     parser_rank.set_defaults(func=command_rank)
-
-    parser_archive = subparsers.add_parser('archive', help="Archive submissions to a challenge")
-    parser_archive.add_argument("evaluation", metavar="EVALUATION-ID", default=None)
-    parser_archive.add_argument("destination", metavar="FOLDER-ID", default=None)
-    parser_archive.add_argument("-q", "--query", default=None)
-    parser_archive.add_argument("-n", "--name", default=None)
-    parser_archive.set_defaults(func=command_archive)
-
+    
     parser_leaderboard = subparsers.add_parser('leaderboard', help="Print the leaderboard for an evaluation")
     parser_leaderboard.add_argument("evaluation", metavar="EVALUATION-ID", default=None)
     parser_leaderboard.add_argument("--out", default=None)
@@ -623,7 +622,7 @@ def main():
             args.user = os.environ.get('SYNAPSE_USER', None)
         if not args.password:
             args.password = os.environ.get('SYNAPSE_PASSWORD', None)
-        syn.login(email=args.user, password=args.password)
+        syn.login(email=args.user, password=args.password, silent=True)
 
         ## initialize messages
         messages.syn = syn
