@@ -50,7 +50,7 @@ Project ID: <b>{project_id}</b>
 <p>If you have questions, please ask on the forums at {support_forum_url}.</p>
 
 <p>Sincerely,<br>
-the scoring script</p>
+The U4C Committee Validation Script</p>
 """
 
 validation_passed_subject_template = "Submission received to {queue_name}"
@@ -76,7 +76,7 @@ Project ID: <b>{project_id}</b>
 instructions which can be found at {challenge_instructions_url}.</p>
 
 <p>Sincerely,<br>
-the scoring script</p>
+The U4C Committee Validation Script</p>
 """
 
 scoring_succeeded_subject_template = "Scored submission to {queue_name}"
