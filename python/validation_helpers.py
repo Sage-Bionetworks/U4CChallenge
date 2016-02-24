@@ -24,7 +24,7 @@ def findAbstract(parentId, syn):
 
 def cleanWiki(w):
     wl = w.split("\n")
-    wl = filter(lambda x: len(x) > 0 and (not x.startswith("${")) and (not x.startswith("> This is a sample project")), wl)
+    wl = filter(lambda x: len(x) > 0 and (not x.startswith("${")) and (not x.startswith("|")) and (not x.startswith("> This is a sample project")), wl)
     return wl
 
 def findHeaderPos(wl):
@@ -37,8 +37,13 @@ def findHeaderPos(wl):
                 posDict[k] = n
 
     return posDict
+   
 
 def removeCodeBlocks(wl):
+    """Remove code blocks (delimited by '```').
+    
+    """
+    
     idxs = []
     toremove = []
 
@@ -176,7 +181,7 @@ def validate_abstract(projectId, syn):
         else:
             return (False, "Found abstract folder at %s but no text. Please add the text of your abstract to the Wiki of that Folder." % (abstractId, ))
     else:
-        return (False, "No abstract found. Please add an Abstract Folder and put the text of your abstract on the Wiki of that Folder.")
+        return (False, "No abstract found. Please add an Abstract Folder and put the text of your abstract on the Wiki of that Folder. If you have created an Abstract Folder, please check the Sharing settings.")
 
 def validate_panel_access(projectId, syn):
 
