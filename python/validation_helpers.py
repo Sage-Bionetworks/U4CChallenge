@@ -24,7 +24,7 @@ def findAbstract(parentId, syn):
 
 def cleanWiki(w):
     wl = w.split("\n")
-    wl = filter(lambda x: len(x) > 0 and (not x.startswith("${")) and (not x.startswith("|")) and (not x.startswith("> This is a sample project")), wl)
+    wl = filter(lambda x: len(x) > 0 and (not x.startswith("${")) and (not x.find("|")) and (not x.startswith("> This is a sample project")), wl)
     return wl
 
 def findHeaderPos(wl):
