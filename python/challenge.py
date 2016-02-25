@@ -424,6 +424,10 @@ def archive(submission, archiveRCommandPath):
 
     return output
 
+def notify(evaluation, dry_run=False):
+
+    if type(evaluation) != Evaluation:
+        evaluation = syn.getEvaluation(evaluation)
 
 ## ==================================================
 ##  Handlers for commands
@@ -527,6 +531,15 @@ def command_leaderboard(args):
 def command_archive(args):
     for submission in args.submission:
         archive(submission, conf.R_ARCHIVE_COMMAND_PATH)
+
+def command_notify(args):
+    if args.all:
+        for queue_info in conf.evaluation_queues:
+            notify(queue_info['id'], etag_file=args.etag_file)
+    elif args.evaluation:
+        notify(args.evaluation, etag_file=args.etag_file)
+    else:
+        sys.stderr.write("\Score command requires either an evaluation ID or --all to score all queues in the challenge")
 
 
 ## ==================================================
