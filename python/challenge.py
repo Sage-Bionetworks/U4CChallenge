@@ -429,6 +429,8 @@ def notify(evaluation, dry_run=False):
     if type(evaluation) != Evaluation:
         evaluation = syn.getEvaluation(evaluation)
 
+    print evaluation
+
 ## ==================================================
 ##  Handlers for commands
 ## ==================================================
@@ -615,6 +617,12 @@ def main():
     parser_archive = subparsers.add_parser('archive', help="Archive a submission")
     parser_archive.add_argument("submission", metavar="SUBMISSION-ID", type=int, nargs='*', help="One or more submission IDs.")
     parser_archive.set_defaults(func=command_archive)
+
+    parser_notify = subparsers.add_parser('notify', help="Notify if changes to evaluation queues")
+    parser_notify.add_argument("--all", action="store_true", default=False)
+    parser_notify.add_argument("evaluation", metavar="EVALUATION-ID", default=None)
+    parser_archive.add_argument("--etag_file", type=file, default=None)
+    parser_notify.set_defaults(func=command_notify)
 
     args = parser.parse_args()
 
