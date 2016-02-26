@@ -1,9 +1,17 @@
 import re
 import synapseclient
 
-_headers = dict(team="**Team Name**", datasets="**Identification of Datasets Used**",
-                methods="**Methods**", collaboration="**Collaboration**",
-                narrative="**Project Narrative**", code="**Code**")
+_headers = dict(team="## **Team Name**", datasets="## **Identification of Datasets Used**",
+                methods="## **Methods**", collaboration="## **Collaboration**",
+                narrative="## **Project Narrative**", code="## **Code**")
+
+_headers_re = dict(team="^## \*\*Team Name\*\*", 
+                   datasets="^## \*\*Identification of Datasets Used\*\*",
+                   methods="^## \*\*Methods\*\*", 
+                   collaboration="^## \*\*Collaboration\*\*",
+                   narrative="^## *\*\*Project Narrative\*\*", 
+                   code="^## *\*\*Code\*\*")
+
 
 _headers_order = ["team", "datasets", "methods", "narrative", "collaboration", "code"]
 
@@ -24,7 +32,7 @@ def findAbstract(parentId, syn):
 
 def cleanWiki(w):
     wl = w.split("\n")
-    wl = filter(lambda x: len(x) > 0 and (not x.startswith("${")) and (not (x.find("|") > 0)) and (not x.startswith("> This is a sample project")), wl)
+    wl = filter(lambda x: len(x) > 0 and (not x.startswith("${")) and (x.find("|") < 0) and (not x.startswith("> This is a sample project")), wl)
     return wl
 
 def findHeaderPos(wl):
@@ -33,7 +41,19 @@ def findHeaderPos(wl):
     for (n, x) in enumerate(wl):
 
         for k, v in _headers.iteritems():
-            if (x.find(v) > 0):
+            if (x.find(v) >= 0):
+                posDict[k] = n
+
+    return posDict
+
+def findHeaderPosRe(wl):
+    posDict = {}
+
+    for (n, x) in enumerate(wl):
+
+        for k, v in _headers_re.iteritems():
+            pos = re.findall(v, x)
+            if (len(pos) > 0):
                 posDict[k] = n
 
     return posDict
@@ -56,10 +76,8 @@ def removeCodeBlocks(wl):
             if (len(idxs) == 2):
                 toremove += range(idxs[0], idxs[1] + 1)
                 idxs = []
-                found = 0
 
-    for x in toremove:
-        wl.pop(x)
+    wl[:] = [x for (n, x) in enumerate(wl) if n not in toremove]
 
     return wl
 
@@ -75,12 +93,14 @@ def cleanSections(sectionList):
     tmp = filter(lambda x: not x.startswith("###"),  tmp)
     tmp = map(lambda x: re.sub(" \[(.*?)\]\(.*?\) ", " \\1 ", x), tmp)
     tmp = map(lambda x: re.sub("syn\d+", "", x), tmp)
+    tmp = map(lambda x: re.sub("\${.*?inlineWidget.*?}", "", x), tmp)
+    
     return tmp
 
 def validate_header_order(wmarkdown):
     wl = cleanWiki(wmarkdown)
-    posDict = findHeaderPos(wl)
-
+    posDict = findHeaderPosRe(wl)
+    
     errors = []
 
     for x in range(1, len(_headers_order)):
@@ -101,10 +121,10 @@ def validate_headers(wmarkdown):
 
     wl = cleanWiki(wmarkdown)
 
-    wl[:] = removeCodeBlocks(wl)
+    # wl[:] = removeCodeBlocks(wl)
 
     # Find the lines of methods, narrative and collab headers
-    posDict = findHeaderPos(wl)
+    posDict = findHeaderPosRe(wl)
 
     errors = []
 
@@ -167,7 +187,6 @@ def validate_abstract(projectId, syn):
         try:
             w = syn.getWiki(abstractId)
         except synapseclient.exceptions.SynapseHTTPError as e:
-
             return (False, "Found abstract folder at %s, but a Wiki has not been added to it. Please add the text of your abstract to the Wiki of that Folder." % (abstractId, ))
 
         wMarkdown = w['markdown']
@@ -184,8 +203,11 @@ def validate_abstract(projectId, syn):
         return (False, "No abstract found. Please add an Abstract Folder and put the text of your abstract on the Wiki of that Folder. If you have created an Abstract Folder, please check the Sharing settings.")
 
 def validate_panel_access(projectId, syn):
-
-    perms = syn.getPermissions(projectId, _evalPanelId)
+    
+    try:
+        perms = syn.getPermissions(projectId, _evalPanelId)
+    except synapseclient.exceptions.SynapseHTTPError as e:
+        return (False, "Evaluation panel cannot read the project.")
 
     if perms == [u'READ']:
         return (True, "Evaluation panel can read the project.")

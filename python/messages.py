@@ -45,7 +45,7 @@ Project ID: <b>{project_id}</b>
 
 
 <p>Please refer to the challenge instructions which can be found at \
-{challenge_instructions_url} and to the error message below:</p>
+{challenge_instructions_url} and to the error message above.</p>
 
 <p>If you have questions, please ask on the forums at {support_forum_url}.</p>
 
@@ -102,7 +102,7 @@ scoring_error_template = """\
 <p>Sorry, but we were unable to process your submission to the {queue_name}.</p>
 
 <p>Please refer to the challenge instructions which can be found at \
-{challenge_instructions_url} and to the error message below:</p>
+{challenge_instructions_url} and to the error message below.</p>
 
 <p>submission name: <b>{submission_name}</b><br>
 submission ID: <b>{submission_id}</b></p>

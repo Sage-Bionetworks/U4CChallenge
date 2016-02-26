@@ -153,7 +153,7 @@ class Query(object):
         return values
 
 
-def validate(evaluation, dry_run=False):
+def validate(evaluation, submission=None, dry_run=False):
 
     if type(evaluation) != Evaluation:
         evaluation = syn.getEvaluation(evaluation)
@@ -161,9 +161,13 @@ def validate(evaluation, dry_run=False):
     print "\n\nValidating", evaluation.id, evaluation.name
     print "-" * 60
     sys.stdout.flush()
-
-
-    for submission, status in syn.getSubmissionBundles(evaluation, status='RECEIVED'):
+    
+    if submission:
+        submission_bundles = [(syn.getSubmission(submission), syn.getSubmissionStatus(submission))]
+    else:
+        submission_bundles = syn.getSubmissionBundles(evaluation, status='RECEIVED')
+    
+    for submission, status in submission_bundles:
 
         ## refetch the submission so that we get the file path
         ## to be later replaced by a "downloadFiles" flag on getSubmissionBundles
@@ -174,6 +178,10 @@ def validate(evaluation, dry_run=False):
             print "Could not get submission:", type(ex1), ex1, ex1.message
             traceback.print_exc()
             validation_message = str(ex1)
+
+        print "\n\nValidating Submission ", submission.id, submission.name
+        print "-" * 60
+        sys.stdout.flush()
 
         try:
             is_valid, validation_message = conf.validate_submission(evaluation, submission)
@@ -190,8 +198,12 @@ def validate(evaluation, dry_run=False):
 
         ## send message AFTER storing status to ensure we don't get repeat messages
         profile = syn.getUserProfile(submission.userId)
-
-        proj = syn.get(submission['entityId'], downloadFile=False)
+        
+        try:
+            proj = syn.get(submission['entityId'], downloadFile=False)
+            proj_name = proj.name
+        except:
+            proj_name = "Unknown"
         
         if is_valid:
 
@@ -207,7 +219,7 @@ def validate(evaluation, dry_run=False):
                 queue_name=evaluation.name,
                 submission_id=submission.id,
                 project_id=submission.entityId,
-                project_name=proj.name,
+                project_name=proj_name,
                 submission_name=submission.name,
                 message=validation_message)
         else:
@@ -217,7 +229,7 @@ def validate(evaluation, dry_run=False):
                 queue_name=evaluation.name,
                 submission_id=submission.id,
                 project_id=submission.entityId,
-                project_name=proj.name,
+                project_name=proj_name,
                 submission_name=submission.name,
                 message=validation_message)
 
@@ -397,7 +409,7 @@ def list_submissions(evaluation, status=None, **kwargs):
             teamId = submission.userId
             isTeam = "Individual"
 
-        print submission.id, submission.createdOn, status.status, submission.name.encode('utf-8'), submission.userId, isTeam, teamId
+        print "\t".join([submission.id, submission.createdOn, status.status, submission.name.encode('utf-8'), submission.userId, isTeam, teamId])
 
 
 def list_evaluations(project):
@@ -494,7 +506,7 @@ def command_validate(args):
         for queue_info in conf.evaluation_queues:
             validate(queue_info['id'], dry_run=args.dry_run)
     elif args.evaluation:
-        validate(args.evaluation, dry_run=args.dry_run)
+        validate(args.evaluation, submission=args.submission, dry_run=args.dry_run)
     else:
         sys.stderr.write("\nValidate command requires either an evaluation ID or --all to validate all queues in the challenge")
 
@@ -576,7 +588,8 @@ def main():
     parser_reset.set_defaults(func=command_reset)
 
     parser_validate = subparsers.add_parser('validate', help="Validate all RECEIVED submissions to an evaluation")
-    parser_validate.add_argument("evaluation", metavar="EVALUATION-ID", nargs='?', default=None, )
+    parser_validate.add_argument("evaluation", metavar="EVALUATION-ID", nargs='?', default=None)
+    parser_validate.add_argument("submission", metavar="SUBMISSION-ID", nargs='?', default=None)
     parser_validate.add_argument("--all", action="store_true", default=False)
     parser_validate.set_defaults(func=command_validate)
 

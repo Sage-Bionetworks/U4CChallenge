@@ -1,7 +1,7 @@
 #!/usr/bin/env r
 
 # Currently requires
-$ devtools::install_github("Sage-Bionetworks/rSynapseUtilities", ref="updatecopywiki")
+devtools::install_github("Sage-Bionetworks/rSynapseUtilities", ref="updatecopywiki")
 
 if (is.null(argv) | length(argv)<1) {
   cat("Usage: archiveProject.R submissionId\n")
@@ -9,7 +9,8 @@ if (is.null(argv) | length(argv)<1) {
 }
 
 library(synapseClient)
-library(synapseUtilities)
+# library(synapseUtilities)
+library(rSynapseUtilities)
 
 synapseLogin()
 
