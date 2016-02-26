@@ -153,7 +153,7 @@ class Query(object):
         return values
 
 
-def validate(evaluation, dry_run=False):
+def validate(evaluation, submission=None, dry_run=False):
 
     if type(evaluation) != Evaluation:
         evaluation = syn.getEvaluation(evaluation)
@@ -162,8 +162,15 @@ def validate(evaluation, dry_run=False):
     print "-" * 60
     sys.stdout.flush()
 
+    if submission:
+        if type(submission) != Submission:
+            submission = syn.getSubmission(submission)
 
-    for submission, status in syn.getSubmissionBundles(evaluation, status='RECEIVED'):
+        submissionBundles = [(submission, syn.getSubmissionStatus(submission))]
+    else:
+        submissionBundles = syn.getSubmissionBundles(evaluation, status='RECEIVED')
+
+    for submission, status in submissionBundles:
 
         ## refetch the submission so that we get the file path
         ## to be later replaced by a "downloadFiles" flag on getSubmissionBundles
@@ -221,7 +228,7 @@ def validate(evaluation, dry_run=False):
                 message=validation_message)
 
 
-def score(evaluation, dry_run=False):
+def score(evaluation, submission=None, dry_run=False):
 
     if type(evaluation) != Evaluation:
         evaluation = syn.getEvaluation(evaluation)
@@ -230,7 +237,15 @@ def score(evaluation, dry_run=False):
     print "-" * 60
     sys.stdout.flush()
 
-    for submission, status in syn.getSubmissionBundles(evaluation, status='VALIDATED'):
+    if submission:
+        if type(submission) != Submission:
+            submission = syn.getSubmission(submission)
+
+        submissionBundles = [(submission, syn.getSubmissionStatus(submission))]
+    else:
+        submissionBundles = syn.getSubmissionBundles(evaluation, status='RECEIVED')
+
+    for submission, status in submissionBundles:
 
         status.status = "INVALID"
 
@@ -492,7 +507,7 @@ def command_validate(args):
         for queue_info in conf.evaluation_queues:
             validate(queue_info['id'], dry_run=args.dry_run)
     elif args.evaluation:
-        validate(args.evaluation, dry_run=args.dry_run)
+        validate(args.evaluation, args.submission, dry_run=args.dry_run)
     else:
         sys.stderr.write("\nValidate command requires either an evaluation ID or --all to validate all queues in the challenge")
 
@@ -571,11 +586,13 @@ def main():
 
     parser_validate = subparsers.add_parser('validate', help="Validate all RECEIVED submissions to an evaluation")
     parser_validate.add_argument("evaluation", metavar="EVALUATION-ID", nargs='?', default=None, )
+    parser_validate.add_argument("submission", metavar="SUBMISSION-ID", nargs='?', default=None)
     parser_validate.add_argument("--all", action="store_true", default=False)
     parser_validate.set_defaults(func=command_validate)
 
     parser_score = subparsers.add_parser('score', help="Score all VALIDATED submissions to an evaluation")
     parser_score.add_argument("evaluation", metavar="EVALUATION-ID", nargs='?', default=None)
+    parser_score.add_argument("submission", metavar="SUBMISSION-ID", nargs='?', default=None)
     parser_score.add_argument("--all", action="store_true", default=False)
     parser_score.set_defaults(func=command_score)
 
