@@ -621,7 +621,7 @@ def main():
     parser_notify = subparsers.add_parser('notify', help="Notify if changes to evaluation queues")
     parser_notify.add_argument("--all", action="store_true", default=False)
     parser_notify.add_argument("evaluation", metavar="EVALUATION-ID", default=None)
-    parser_archive.add_argument("--etag_file", type=file, default=None)
+    parser_notify.add_argument("--etag_file", type=file, default=None)
     parser_notify.set_defaults(func=command_notify)
 
     args = parser.parse_args()
