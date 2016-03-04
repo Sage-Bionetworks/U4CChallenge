@@ -1,7 +1,9 @@
 #!/usr/bin/env r
 
 # Currently requires
-devtools::install_github("Sage-Bionetworks/rSynapseUtilities", ref="updatecopywiki")
+if (!require(rSynapseUtilities)) {
+   devtools::install_github("Sage-Bionetworks/rSynapseUtilities", ref="updatecopywiki")
+}
 
 if (is.null(argv) | length(argv)<1) {
   cat("Usage: archiveProject.R submissionId\n")
@@ -37,12 +39,11 @@ newP <- synStore(newP)
 # Perform a copy
 pC <- copyProject(newP@properties$id, G, topId=newP@properties$id)
 
-synSetAnnotation(newP, "archived") <- TRUE
-
 newP <- synStore(newP)
 
 # Create entity mapping to update wikis
-entityMap <- pC$newid
+H <- crawlSynapseObject(newP@properties$id)
+entityMap <- H$id
 names(entityMap) <- G$id
 
 # copy Wikis
@@ -52,4 +53,7 @@ res <- lapply(seq_along(entityMap),
                                             updateLinks=FALSE, 
 					    updateSynIds=FALSE),
 					    # entityMap=entityMap),
-                                   error=function(e) NULL))
+                                   error=function(e) cat(e$message)))
+
+synSetAnnotation(newP, "archived") <- TRUE
+newP <- synStore(newP)
