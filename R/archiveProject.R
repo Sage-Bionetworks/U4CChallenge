@@ -48,8 +48,8 @@ names(entityMap) <- G$id
 # copy Wikis
 res <- lapply(seq_along(entityMap),
               function(i) tryCatch(copyWiki(names(entityMap[i]),
-				            entityMap[i],
+                                            entityMap[i],
                                             updateLinks=FALSE, 
-					    updateSynIds=FALSE),
-					    # entityMap=entityMap),
+                                            updateSynIds=FALSE),
+                                   # entityMap=entityMap),
                                    error=function(e) NULL))
